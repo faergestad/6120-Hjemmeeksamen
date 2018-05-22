@@ -8,9 +8,9 @@ import org.json.JSONObject;
 public class Tur {
 
 
-    private int turID, aarsModell, ledigeSeter;
+    private int turID, aarsModell, ledigeSeter, telefonNr;
     private String sjafor, avreiseSted, reiseMaal, dato, avreiseKl, reiseTidMinutter,
-            passasjer1, passasjer2, passasjer3, passasjer4, bilmerke;
+            passasjer1, passasjer2, passasjer3, passasjer4, epost, bilmerke;
     
     private static final String KOL_NAVN_TUR_ID             = "turID";
     private static final String KOL_NAVN_SJAFOR             = "sjafor";
@@ -26,13 +26,15 @@ public class Tur {
     private static final String KOL_NAVN_BILMERKE           = "bilmerke";
     private static final String KOL_NAVN_AARSMODELL         = "aarsModell";
     private static final String KOL_NAVN_LEDIGESETER        = "ledigeSeter";
+    private static final String KOL_NAVN_EPOST              = "epost";
+    private static final String KOL_NAVN_TELEFONNR          = "telefonnr";
 
     public Tur(){
 
     }
 
     public Tur(int turID, String sjafor, String avreiseSted, String reiseMaal, String dato, String avreiseKl,
-               String reiseTidMinutter, String passasjer1, String passasjer2, String passasjer3, String passasjer4, int ledigeSeter, String bilmerke, int aarsModell) {
+               String reiseTidMinutter, String passasjer1, String passasjer2, String passasjer3, String passasjer4, int ledigeSeter, String epost, int telefonNr, String bilmerke, int aarsModell) {
 
         this.turID              = turID;
         this.sjafor             = sjafor;
@@ -46,6 +48,8 @@ public class Tur {
         this.passasjer3         = passasjer3;
         this.passasjer4         = passasjer4;
         this.ledigeSeter        = ledigeSeter;
+        this.epost              = epost;
+        this.telefonNr          = telefonNr;
         this.bilmerke           = bilmerke;
         this.aarsModell         = aarsModell;
 
@@ -64,6 +68,8 @@ public class Tur {
         this.passasjer3         = jsonTur.optString("passasjer3");
         this.passasjer4         = jsonTur.optString("passasjer4");
         this.ledigeSeter        = jsonTur.optInt("ledigeSeter");
+        this.epost              = jsonTur.optString("epost");
+        this.telefonNr          = jsonTur.optInt("telefonnr");
         this.bilmerke           = jsonTur.optString("bilmerke");
         this.aarsModell         = jsonTur.optInt("aarsModell");
     }
@@ -84,6 +90,8 @@ public class Tur {
             jsonTur.put(KOL_NAVN_PASSASJER3, this.passasjer3);
             jsonTur.put(KOL_NAVN_PASSASJER4, this.passasjer4);
             jsonTur.put(KOL_NAVN_LEDIGESETER, this.ledigeSeter);
+            jsonTur.put(KOL_NAVN_EPOST, this.epost);
+            jsonTur.put(KOL_NAVN_TELEFONNR, this.telefonNr);
             jsonTur.put(KOL_NAVN_BILMERKE, this.bilmerke);
             jsonTur.put(KOL_NAVN_AARSMODELL, this.aarsModell);
         } catch (JSONException e) {
@@ -205,5 +213,21 @@ public class Tur {
 
     public void setLedigeSeter(int ledigeSeter) {
         this.ledigeSeter = ledigeSeter;
+    }
+
+    public int getTelefonNr() {
+        return telefonNr;
+    }
+
+    public void setTelefonNr(int telefonNr) {
+        this.telefonNr = telefonNr;
+    }
+
+    public String getEpost() {
+        return epost;
+    }
+
+    public void setEpost(String epost) {
+        this.epost = epost;
     }
 }

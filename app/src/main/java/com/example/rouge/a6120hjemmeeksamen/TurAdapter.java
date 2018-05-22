@@ -151,6 +151,8 @@ public class TurAdapter extends RecyclerView.Adapter<TurAdapter.ViewHolder> impl
                 turInfo.add(tur.getPassasjer4());                   // 10
                 turInfo.add(tur.getBilmerke());                     // 11
                 turInfo.add(String.valueOf(tur.getAarsModell()));   // 12
+                turInfo.add(tur.getEpost());                        // 13
+                turInfo.add(String.valueOf(tur.getTelefonNr()));    // 14
 
                 String fraAdresse = tur.getAvreiseSted();
                 String fraAdresseUrlFormat = fraAdresse.replaceAll("\\s", "+");
@@ -384,7 +386,7 @@ public class TurAdapter extends RecyclerView.Adapter<TurAdapter.ViewHolder> impl
         }
 
         // Åpner et dialogivindu med informasjon om turen, og mulighet for å "melde seg på"
-        AlertDialog.Builder reiseInfo = new AlertDialog.Builder(context);
+        final AlertDialog.Builder reiseInfo = new AlertDialog.Builder(context);
         reiseInfo.setTitle("Informasjon om reise");
         reiseInfo.setMessage(informasjon);
 
@@ -408,32 +410,55 @@ public class TurAdapter extends RecyclerView.Adapter<TurAdapter.ViewHolder> impl
                                 public void onResponse(String response) {
 
                                     if(response.equals("Suksess")) {
-                                        Toast.makeText(context, "Lagt til i \"Mine turer\"", Toast.LENGTH_SHORT).show();
 
-                                    // Legg til turen i brukerens kalender
-                                    Intent turTilKalender = new Intent(Intent.ACTION_INSERT);
-                                    turTilKalender.setType("vnd.android.cursor.item/event");
-                                    turTilKalender.putExtra(CalendarContract.Events.TITLE, "Du haiker med " + turInfo.get(1));
-                                    turTilKalender.putExtra(CalendarContract.Events.EVENT_LOCATION, turInfo.get(2));
-                                    turTilKalender.putExtra(CalendarContract.Events.DESCRIPTION, "Reise fra: " + turInfo.get(2) + "\nTil: " + turInfo.get(3));
-                                    turTilKalender.putExtra(CalendarContract.Events.ALLOWED_REMINDERS, true);
+                                        AlertDialog.Builder kalenderPrompt = new AlertDialog.Builder(context);
+                                        kalenderPrompt.setTitle("Lagt til i \"Mine turer\"");
+                                        kalenderPrompt.setMessage("Vil du legge til turen i din kalender?");
 
-                                    String turDato = turInfo.get(4);
-                                    String turAvreiseKl = turInfo.get(5);
-                                    Calendar kalender = Calendar.getInstance();
-                                        Date dato = null;
-                                        try {
-                                            dato = new SimpleDateFormat("yyyy-MM-dd-HH-mm").parse(
-                                                    turDato+"-"+turAvreiseKl.charAt(0)+turAvreiseKl.charAt(1)+"-"+turAvreiseKl.charAt(3)+turAvreiseKl.charAt(4));
-                                        } catch (ParseException e) {
-                                            e.printStackTrace();
-                                        }
-                                        Log.d("dato", "" + dato);
-                                        kalender.setTime(dato);
+                                        kalenderPrompt.setPositiveButton(
+                                                "Ja",
+                                                new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
 
-                                        turTilKalender.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, kalender.getTimeInMillis());
+                                                        // Legg til turen i brukerens kalender
+                                                        Intent turTilKalender = new Intent(Intent.ACTION_INSERT);
+                                                        turTilKalender.setType("vnd.android.cursor.item/event");
+                                                        turTilKalender.putExtra(CalendarContract.Events.TITLE, "Du haiker med " + turInfo.get(1));
+                                                        turTilKalender.putExtra(CalendarContract.Events.EVENT_LOCATION, turInfo.get(2));
+                                                        turTilKalender.putExtra(CalendarContract.Events.DESCRIPTION, "Reise fra: " + turInfo.get(2) + "\nTil: " + turInfo.get(3));
+                                                        turTilKalender.putExtra(CalendarContract.Events.ALLOWED_REMINDERS, true);
 
-                                    context.startActivity(turTilKalender);
+                                                        String turDato = turInfo.get(4);
+                                                        String turAvreiseKl = turInfo.get(5);
+                                                        Calendar kalender = Calendar.getInstance();
+                                                        Date dato = null;
+                                                        try {
+                                                            dato = new SimpleDateFormat("yyyy-MM-dd-HH-mm").parse(
+                                                                    turDato+"-"+turAvreiseKl.charAt(0)+turAvreiseKl.charAt(1)+"-"+turAvreiseKl.charAt(3)+turAvreiseKl.charAt(4));
+                                                        } catch (ParseException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                        Log.d("dato", "" + dato);
+                                                        kalender.setTime(dato);
+
+                                                        turTilKalender.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, kalender.getTimeInMillis());
+
+                                                        context.startActivity(turTilKalender);
+
+                                                    }
+                                                }
+                                        );
+                                        kalenderPrompt.setNegativeButton(
+                                                "Nei",
+                                                new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int i) {
+                                                        dialog.cancel();
+                                                    }
+                                                }
+                                        );
+                                        kalenderPrompt.show();
 
                                     } else {
                                         Toast.makeText(context, "Det var rart.. Prøv igjen", Toast.LENGTH_SHORT).show();

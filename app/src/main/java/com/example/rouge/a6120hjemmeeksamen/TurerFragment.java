@@ -90,7 +90,6 @@ public class TurerFragment extends Fragment implements OnMapReadyCallback, Searc
     }
 
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.search, menu);
@@ -127,7 +126,7 @@ public class TurerFragment extends Fragment implements OnMapReadyCallback, Searc
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-
+        // Måtte implementeres, men trengs ikke
         return false;
     }
 
@@ -168,6 +167,8 @@ public class TurerFragment extends Fragment implements OnMapReadyCallback, Searc
                         tur.setPassasjer2(jsonTur.getString("passasjer2"));
                         tur.setPassasjer3(jsonTur.getString("passasjer3"));
                         tur.setPassasjer4(jsonTur.getString("passasjer4"));
+                        tur.setEpost(jsonTur.getString("epost"));
+                        tur.setTelefonNr(parseInt(jsonTur.getString("telefonnr")));
                         tur.setBilmerke(jsonTur.getString("bilmerke"));
                         tur.setAarsModell(jsonTur.getInt("aarsModell"));
 
