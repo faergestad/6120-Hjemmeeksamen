@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_hjem"
+            android:icon="@drawable/hjem"
+            android:title="Dashboard" />
+        <item
+            android:id="@+id/mine_turer"
+            android:icon="@drawable/mineturer"
+            android:title="Mine turer" />
+        <item
+            android:id="@+id/se_turer"
+            android:icon="@drawable/seturer"
+            android:title="Se turer" />
+        <item
+            android:id="@+id/ny_tur"
+            android:icon="@drawable/nytur"
+            android:title="Legg til tur" />
+        <item
+            android:id="@+id/faste_turer"
+            android:icon="@drawable/fasteturer"
+            android:title="Faste turer" />
+    </group>
+
+</menu>
