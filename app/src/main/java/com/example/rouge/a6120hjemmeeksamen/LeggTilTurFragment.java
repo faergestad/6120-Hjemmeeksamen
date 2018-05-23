@@ -27,7 +27,7 @@ import java.net.URL;
 import static java.lang.Integer.parseInt;
 
 
-public class LeggTilVareFragment extends Fragment {
+public class LeggTilTurFragment extends Fragment {
 
     String melding, ID_Holder, Beskrivelse_Holder, Pris_Holder, LagerAnt_Holder;
     EditText leggTilId, leggTilBeskrivelse, leggTilPris, leggTilLagerAntall;
@@ -39,7 +39,7 @@ public class LeggTilVareFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstance) {
         super.onViewCreated(view, savedInstance);
 
-        getActivity().setTitle("Legg til vare");
+        getActivity().setTitle("Opprett ny tur");
 
         leggTilId = view.findViewById(R.id.varekode);
         leggTilBeskrivelse = view.findViewById(R.id.betegnelse);
@@ -62,7 +62,7 @@ public class LeggTilVareFragment extends Fragment {
                     //Tur tur = new Tur(id, desc, pris, lagerAntall, 1);
                     //jsonVare = tur.lagJSONObject();
 
-                    LeggTilVareFragment.NyVare nyVare = new LeggTilVareFragment.NyVare();
+                    LeggTilTurFragment.NyVare nyVare = new LeggTilTurFragment.NyVare();
                     nyVare.execute();
                 } else {
                     Toast.makeText(getContext(), "Fyll ut alle feltene", Toast.LENGTH_SHORT).show();
@@ -76,7 +76,7 @@ public class LeggTilVareFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_legg_til_vare, container, false);
+        return inflater.inflate(R.layout.fragment_legg_til_tur, container, false);
     }
 
     public class NyVare extends AsyncTask<String, String, Long> {

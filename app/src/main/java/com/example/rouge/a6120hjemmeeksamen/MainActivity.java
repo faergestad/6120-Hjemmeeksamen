@@ -44,11 +44,18 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
+        // Gjør det mulig å lukke menyen ved å trykke tilbake
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        int tell = getFragmentManager().getBackStackEntryCount();
+
         if (drawer.isDrawerOpen(GravityCompat.START)) {
+            // Lukker skuff-menyen
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        } else if (tell == 0) {
             super.onBackPressed();
+        } else {
+            // Gjør det mulig å gå tilbake til forrige fragment ved å trykke tilbake
+            getFragmentManager().popBackStack();
         }
     }
 
@@ -92,7 +99,7 @@ public class MainActivity extends AppCompatActivity
                 fragment = new TurerFragment();
                 break;
             case R.id.ny_tur:
-                fragment = new LeggTilVareFragment();
+                fragment = new LeggTilTurFragment();
                 break;
             case R.id.faste_turer:
                 fragment = new AnsatteFragment();
@@ -102,6 +109,7 @@ public class MainActivity extends AppCompatActivity
         if (fragment != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_main, fragment);
+            ft.addToBackStack("fragment");
             ft.commit();
         }
 

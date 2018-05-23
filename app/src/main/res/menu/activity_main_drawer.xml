@@ -7,23 +7,23 @@
         <item
             android:id="@+id/nav_hjem"
             android:icon="@drawable/hjem"
-            android:title="Dashboard" />
+            android:title="@string/dashboard" />
         <item
             android:id="@+id/mine_turer"
             android:icon="@drawable/mineturer"
-            android:title="Mine turer" />
+            android:title="@string/mine_turer" />
         <item
             android:id="@+id/se_turer"
             android:icon="@drawable/seturer"
-            android:title="Se turer" />
+            android:title="@string/se_turer" />
         <item
             android:id="@+id/ny_tur"
             android:icon="@drawable/nytur"
-            android:title="Legg til tur" />
+            android:title="@string/opprett_ny_tur" />
         <item
             android:id="@+id/faste_turer"
             android:icon="@drawable/fasteturer"
-            android:title="Faste turer" />
+            android:title="@string/faste_turer" />
     </group>
 
 </menu>

@@ -192,7 +192,8 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int i) {
-                                        sendMelding(parseInt(turInfo.get(14)));
+                                        //sendMelding(parseInt(turInfo.get(14)));
+                                        sendTilPassasjerer(new String[]{"92651892", "12345678", "81549300"});
                                         dialog.cancel();
                                     }
                                 }
@@ -291,7 +292,7 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
     public void sendMelding(int telefonNummer) {
         // Intent for å sende sende melding til sjaføren, med catch for om brukeren ikke kan sende sms
         try {
-            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", String.valueOf(telefonNummer), null)));
+            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms:", String.valueOf(telefonNummer), null)));
         } catch (ActivityNotFoundException e) {
             e.printStackTrace();
             Toast.makeText(context, "Du har ingen SMS-app", Toast.LENGTH_SHORT).show();
@@ -315,6 +316,22 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
         } catch (ActivityNotFoundException e) {
             e.printStackTrace();
             Toast.makeText(context, "Fant ingen app du kan sende mail fra", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void sendTilPassasjerer(String[] passasjerer) {
+        StringBuilder mottakere = new StringBuilder();
+        for (String passasjer : passasjerer) {
+            mottakere.append(passasjer+";");
+        }
+
+        try {
+            Intent gruppemelding = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:"+mottakere));
+            gruppemelding.putExtra("sms_body", "Turen er avlyst");
+            context.startActivity(gruppemelding);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Fant ingen app du kan sende meldinger fra", Toast.LENGTH_SHORT).show();
         }
     }
 
