@@ -84,4 +84,12 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="registrerValgfri">Har du ikke bil trenger du ikke fylle ut de to siste*</string>
+    <string name="epost">Epost</string>
+    <string name="passord">Passord</string>
+    <string name="navn"><![CDATA[Fornavn & Etternavn]]></string>
+    <string name="tlf">Telefonnummer</string>
+    <string name="bilmerke">Bilmerke</string>
+    <string name="rsmodell">Årsmodell</string>
+    <string name="registrer">Registrer</string>
 </resources>

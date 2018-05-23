@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorPrimary"
+    android:gravity="center"
+    android:paddingRight="30dp"
+    android:paddingLeft="30dp"
+    tools:context=".RegistrerBruker">
+
+    <EditText
+        android:id="@+id/editepost"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/transWhite"
+        android:textColor="@android:color/white"
+        android:textColorHint="@color/transWhite"
+        android:inputType="textEmailAddress"
+        android:hint="@string/epost"/>
+
+    <EditText
+        android:id="@+id/editpassord"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/transWhite"
+        android:textColor="@android:color/white"
+        android:inputType="textPassword"
+        android:textColorHint="@color/transWhite"
+        android:hint="@string/passord"/>
+
+    <EditText
+        android:id="@+id/editnavn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/transWhite"
+        android:textColor="@android:color/white"
+        android:inputType="textPersonName"
+        android:textColorHint="@color/transWhite"
+        android:hint="@string/navn"/>
+
+    <EditText
+        android:id="@+id/edittlf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/transWhite"
+        android:textColor="@android:color/white"
+        android:inputType="number"
+        android:textColorHint="@color/transWhite"
+        android:hint="@string/tlf"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/transWhite"
+        android:textColor="@android:color/white"
+        android:text="@string/registrerValgfri" />
+
+    <EditText
+        android:id="@+id/editbilmerke"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/transWhite"
+        android:textColor="@android:color/white"
+        android:inputType="text"
+        android:textColorHint="@color/transWhite"
+        android:hint="@string/bilmerke" />
+
+    <EditText
+        android:id="@+id/editaarsModell"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/transWhite"
+        android:textColor="@android:color/white"
+        android:textColorHint="@color/transWhite"
+        android:inputType="number"
+        android:hint="@string/rsmodell"/>
+
+    <Button
+        android:id="@+id/registrer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/registrer"
+        android:fontFamily="@font/roboto_light"
+        android:background="@drawable/rounded_button"/>
+
+</LinearLayout>

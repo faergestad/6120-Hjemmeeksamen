@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -15,19 +16,28 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.util.HashMap;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
-public class LoginActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
+import java.util.HashMap;
+import java.util.Map;
+
+public class LoginActivity extends AppCompatActivity {
 
     public static final String UserEmail = "";
     EditText Email, Password;
-    Button LogIn;
+    Button loggInnBtn;
     String PasswordHolder, EmailHolder;
     String finalResult;
     // Lokal filsti for emulator :
     String HttpURL = "http://10.0.2.2/hobbyhuset/UserLogin.php";
     // String HttpURL = "http://192.168.10.171/hobbyhuset/UserLogin.php";
-    Boolean CheckEditText;
+    Boolean ikkeErTom;
     ProgressDialog progressDialog;
     HashMap<String, String> hashMap = new HashMap<>();
     HttpParse httpParse = new HttpParse();
@@ -42,51 +52,38 @@ public class LoginActivity extends AppCompatActivity implements CompoundButton.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Email = findViewById(R.id.email);
-        Password = findViewById(R.id.password);
-        LogIn = findViewById(R.id.Login);
-        rememberMe = findViewById(R.id.huskMeg);
-        rememberMe.setOnCheckedChangeListener(this);
-        checked = rememberMe.isChecked();
+        Email = findViewById(R.id.userField);
+        Password = findViewById(R.id.passField);
+        loggInnBtn = findViewById(R.id.login);
 
-        pref = getSharedPreferences("login.conf", Context.MODE_PRIVATE);
-        /** TODO Bruk en annen sharedPreferences-fil for å lagre innloggin hvis brukeren ikke huker av for å bli husket
-         //prefStore = getSharedPreferences("storeLogin.conf", Context.MODE_PRIVATE);
-         //prefStoreEditor = prefStore.edit(); */
+
+        pref = getSharedPreferences("login", Context.MODE_PRIVATE);
         editor = pref.edit();
 
-        String prefUname = pref.getString("username", "");
-        String prefPass = pref.getString("password", "");
+        String husketEpost = pref.getString("epost", "");
+        String husketPassord = pref.getString("passord", "");
 
-        if (!(prefUname.equals("") && prefPass.equals(""))) {
-            UserLoginFunction(prefUname, prefPass);
+
+        if (!(husketEpost.equals("") && husketPassord.equals(""))) {
+            loggInn(husketEpost, husketPassord);
         }
 
-        // midlertidig fix for direkte login
-        Intent login = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(login);
-
-        LogIn.setOnClickListener(new View.OnClickListener() {
+        loggInnBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
 
-                CheckEditTextIsEmptyOrNot();
+                String epost = Email.getText().toString();
+                String passord = Password.getText().toString();
 
-                if (CheckEditText) {
+                sjekkOmErTom(epost,passord);
 
-                    if(checked) {
-                        editor.putString("username", Email.getText().toString());
-                        editor.putString("password", Password.getText().toString());
-                        editor.apply();
-                    } /** Dette legger innloggingen i storeLogin.conf hvis det skal legges inn som en funksjon i "Settings"-menyen
-                     else {
-                     prefStoreEditor.putString("username", Email.getText().toString());
-                     prefStoreEditor.putString("password", Password.getText().toString());
-                     prefStoreEditor.apply();
+                if (ikkeErTom) {
+                    // Legger innlogging i sharedpreferences for å automatisk logge inn etter første gang
+                    editor.putString("epost", epost);
+                    editor.putString("passord", passord);
+                    editor.apply();
 
-                     }*/
-
-                    UserLoginFunction(EmailHolder, PasswordHolder);
+                    loggInn(epost, passord);
 
                 } else {
 
@@ -96,79 +93,63 @@ public class LoginActivity extends AppCompatActivity implements CompoundButton.O
 
             }
         });
+
     }
 
-    public void CheckEditTextIsEmptyOrNot() {
+    // Metode for å sjekke om teksfeltene har innhold
+    private void sjekkOmErTom(String epost, String passord) {
 
-        EmailHolder = Email.getText().toString();
-        PasswordHolder = Password.getText().toString();
-
-        if (TextUtils.isEmpty(EmailHolder) || TextUtils.isEmpty(PasswordHolder)) {
-            CheckEditText = false;
+        if (TextUtils.isEmpty(epost) || TextUtils.isEmpty(passord)) {
+            ikkeErTom = false;
         } else {
-
-            CheckEditText = true;
+            ikkeErTom = true;
         }
+
     }
 
-    public void UserLoginFunction(final String email, final String password) {
-        // Når klassen extender AsyncTask, genereres onPreExecute, onPostExecute og doInBackground automatisk
-        class UserLoginClass extends AsyncTask<String, Void, String> {
+    public void loggInn(final String epost, final String passord) {
 
+        String opprettBrukerURL = "http://gakk.one/6120-hjemmeeksamen/loggInn.php";
+
+        StringRequest loginRequest = new StringRequest(Request.Method.POST, opprettBrukerURL, new Response.Listener<String>() {
             @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
+            public void onResponse(String response) {
 
-                progressDialog = ProgressDialog.show(LoginActivity.this, "Laster Data", null, true, true);
-            }
+                if (response.equals("Suksess")) {
 
-            @Override
-            protected void onPostExecute(String httpResponseMsg) {
-
-                super.onPostExecute(httpResponseMsg);
-
-                progressDialog.dismiss();
-
-                if (httpResponseMsg.equalsIgnoreCase("Bruker Funnet")) {
-
-                    finish();
-
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.putExtra(UserEmail, email);
-
-                    Toast.makeText(LoginActivity.this, "Du er logget inn", Toast.LENGTH_SHORT).show();
-
-                    startActivity(intent);
-
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
 
                 } else {
 
-                    Toast.makeText(LoginActivity.this, httpResponseMsg, Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, "Feil brukernavn eller passord", Toast.LENGTH_SHORT).show();
+                    Log.d("Response", "" + response);
+
                 }
 
             }
-
+        }, new Response.ErrorListener() {
             @Override
-            protected String doInBackground(String... params) {
-
-                hashMap.put("email", params[0]);
-
-                hashMap.put("password", params[1]);
-
-                finalResult = httpParse.postRequest(hashMap, HttpURL,"POST");
-
-                return finalResult;
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volleyfeil", "" + error);
             }
-        }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("epost", epost);
+                params.put("passord", passord);
+                return params;
+            }
+        };
 
-        UserLoginClass userLoginClass = new UserLoginClass();
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(loginRequest);
 
-        userLoginClass.execute(email, password);
     }
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        checked = isChecked;
+    public void registrerBruker(View view) {
+        Intent intent = new Intent(LoginActivity.this, RegistrerBruker.class);
+        startActivity(intent);
     }
 
 }

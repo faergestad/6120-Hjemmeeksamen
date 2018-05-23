@@ -3,54 +3,69 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
+    android:background="@color/colorPrimary"
     android:orientation="vertical"
+    android:paddingTop="20dp"
     tools:context=".LoginActivity">
 
     <ImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:src="@drawable/house_logo"/>
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:src="@drawable/usnlogo"/>
 
-    <EditText
-        android:id="@+id/email"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:background="#fbfefd"
-        android:gravity="center"
-        android:hint="Skriv Inn Epost"
-        android:inputType="textEmailAddress" />
-
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:background="#fbfefd"
-        android:gravity="center"
-        android:hint="Skriv Inn Passord"
-        android:inputType="textPassword"/>
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingLeft="40dp"
-        android:paddingTop="10dp">
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp">
 
-        <CheckBox
-            android:id="@+id/huskMeg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/username" />
 
-        <TextView
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/userField"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Husk meg"/>
-    </LinearLayout>
+            android:paddingTop="30dp"
+            android:paddingLeft="50dp"
+            android:backgroundTint="@color/transWhite"
+            android:inputType="textEmailAddress"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/roboto_light"
+            android:textSize="22sp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/password" />
+
+        <EditText
+            android:id="@+id/passField"
+            android:textColor="@android:color/white"
+            android:textSize="30sp"
+            android:inputType="textPassword"
+            android:textAlignment="center"
+            android:backgroundTint="@color/transWhite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -61,14 +76,25 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/Login"
-            android:layout_width="160dp"
+            android:id="@+id/login"
+            android:layout_width="150dp"
             android:layout_height="56dp"
             android:layout_below="@+id/password"
             android:layout_marginTop="20dp"
             android:background="@drawable/rounded_button"
+            android:fontFamily="@font/roboto_light"
             android:text="Logg Inn"
             android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/register"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:background="@null"
+            android:textColor="@android:color/white"
+            android:alpha=".7"
+            android:onClick="registrerBruker"
+            android:text="Registrer deg"/>
 
     </LinearLayout>
 

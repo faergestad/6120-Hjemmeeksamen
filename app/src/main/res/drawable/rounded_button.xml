@@ -3,11 +3,10 @@
     android:shape="rectangle">
 
     <solid
-        android:color="#CCCCCF"
+        android:color="#FFFF"
         />
 
-    // Reduce the corner radius value
-    <corners android:radius="15dp" />
+    <corners android:radius="35dp" />
 
     <padding
         android:left="20dp"
