@@ -10,8 +10,6 @@
         android:id="@+id/mineturer_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/map"
         android:clipToPadding="false"/>
 
 </LinearLayout>

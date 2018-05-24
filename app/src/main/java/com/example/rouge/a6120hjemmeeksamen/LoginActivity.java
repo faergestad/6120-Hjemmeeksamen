@@ -43,7 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         Password = findViewById(R.id.passField);
         loggInnBtn = findViewById(R.id.login);
 
-
+        // Oppretter en fil som heter "login" for å lagre epost og passord
         pref = getSharedPreferences("login", Context.MODE_PRIVATE);
         editor = pref.edit();
 
@@ -102,7 +102,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
 
-                if (response.equals("Suksess")) {
+                if (!(response.equals("Feil"))) {
+
+                    editor.putString("navn", response);
+                    editor.apply();
 
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
 
@@ -110,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     Toast.makeText(LoginActivity.this, "Feil brukernavn eller passord", Toast.LENGTH_SHORT).show();
                     Log.d("Response", "" + response);
-
+                    // TODO legg til håndtering for om serveren er nede. Siden one.com er så ustabil
                 }
 
             }
@@ -122,6 +125,7 @@ public class LoginActivity extends AppCompatActivity {
         }){
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
+                // Sender med brukerens epost og passord for å autorisere brukeren
                 Map<String, String> params = new HashMap<>();
                 params.put("epost", epost);
                 params.put("passord", passord);

@@ -78,7 +78,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:gravity="center"
                 android:orientation="horizontal">
 
                 <TextView
@@ -132,7 +131,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/roboto_light"
                     android:textStyle="italic"
-                    android:text="ankomstHer" />
+                    android:text="" />
 
             </LinearLayout>
 

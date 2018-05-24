@@ -2,17 +2,13 @@ package com.example.rouge.a6120hjemmeeksamen;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.util.SortedList;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.util.SortedListAdapterCallback;
-import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Spinner;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -38,6 +33,7 @@ import com.google.android.gms.maps.model.LatLng;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +49,7 @@ public class TurerFragment extends Fragment implements OnMapReadyCallback, Searc
     private List<Tur> resultat;
     private List<Tur> reset;
     private RecyclerView.Adapter adapter;
+    SharedPreferences pref;
 
     public TurerFragment() {
         // Tom konstruktør
@@ -92,6 +89,7 @@ public class TurerFragment extends Fragment implements OnMapReadyCallback, Searc
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflater søke-ikonet
         inflater.inflate(R.menu.search, menu);
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
@@ -114,7 +112,7 @@ public class TurerFragment extends Fragment implements OnMapReadyCallback, Searc
         turListe.clear();
         // Legger til søkeresultatet
         turListe.addAll(resultat);
-        // Hvis brukeren sletter søket, tilbakestill listen
+        // Hvis brukeren sletter søket, tilbakestilles listen
         if(query.equals("")){
             turListe.addAll(reset);
         }
@@ -135,8 +133,8 @@ public class TurerFragment extends Fragment implements OnMapReadyCallback, Searc
         progressDialog.setMessage("Laster...");
         progressDialog.show();
 
-        // TODO bytte om dette til brukerens navn
-        final String navn = "Gregers Gram";
+        pref = getActivity().getSharedPreferences("login", Context.MODE_PRIVATE);
+        final String navn = pref.getString("navn", "");
 
         final String JSON_URL = "http://gakk.one/6120-hjemmeeksamen/seTurer.php";
         StringRequest jsonStringRequest = new StringRequest(Request.Method.POST, JSON_URL, new Response.Listener<String>() {
@@ -205,6 +203,7 @@ public class TurerFragment extends Fragment implements OnMapReadyCallback, Searc
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        // Oppretter en default LatLng så kartets kamera viser hele norge ved oppstart
         LatLng norge = new LatLng(64.190122, 11.852735);
         mMap.moveCamera(CameraUpdateFactory.zoomTo(3));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(norge));

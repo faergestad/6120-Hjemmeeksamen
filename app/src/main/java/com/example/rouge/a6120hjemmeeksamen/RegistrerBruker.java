@@ -1,8 +1,8 @@
 package com.example.rouge.a6120hjemmeeksamen;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -58,7 +58,6 @@ public class RegistrerBruker extends AppCompatActivity {
                 } else {
                     Toast.makeText(RegistrerBruker.this, "Fyll ut alle feltene", Toast.LENGTH_SHORT).show();
                 }
-
 
             }
         });

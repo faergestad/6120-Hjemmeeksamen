@@ -96,4 +96,12 @@
     <string name="se_turer">Se turer</string>
     <string name="opprett_ny_tur">Opprett ny tur</string>
     <string name="faste_turer">Faste turer</string>
+    <string name="logg_ut">Logg ut</string>
+    <string name="velg_m_l">Velg mål</string>
+    <string name="fast_avreisem_l">Fast avreisemål</string>
+    <string name="velg_tid">Velg tid</string>
+    <string name="fast_avreisetidspunkt">Fast avreisetidspunkt</string>
+    <string name="velg_sted">Velg sted</string>
+    <string name="fast_avreisested">Fast avreisested</string>
+    <string name="lagre_min_faste_informasjon">Lagre min faste informasjon</string>
 </resources>

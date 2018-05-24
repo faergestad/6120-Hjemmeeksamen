@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,6 +27,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +43,8 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
     private Context context;
     private List<Tur> list;
     private List<String> turInfo;
+    SharedPreferences pref;
+    int teller;
 
     public MineTurerAdapter(Context context, List<Tur> list) {
         this.context = context;
@@ -52,26 +59,49 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        final Tur tur= list.get(position);
+        final Tur tur = list.get(position);
         // turInfo brukes som 'placeholder' for all info om èn tur i onclick
         turInfo = new ArrayList<>();
+        pref = context.getSharedPreferences("login", Context.MODE_PRIVATE);
+        final String navn = pref.getString("navn", "");
 
         // Sjekk for å velge hvilket ikon som skal vises frem, og hvor mange ledige plasser det er i bilen
         // Jeg sammenligner med == fordi databasen returnerer "null" hvis passasjerfeltet er tomt
-        if(tur.getPassasjer1() == "null") {
-            tur.setLedigeSeter(4);
-            holder.seter.setImageResource(R.drawable.fireledige);
-        } else if(tur.getPassasjer2() == "null") {
-            tur.setLedigeSeter(3);
-            holder.seter.setImageResource(R.drawable.treledige);
-        } else if(tur.getPassasjer3() == "null") {
-            tur.setLedigeSeter(2);
-            holder.seter.setImageResource(R.drawable.toledige);
-        } else if(tur.getPassasjer4() == "null") {
-            tur.setLedigeSeter(1);
-            holder.seter.setImageResource(R.drawable.enledig);
-        } else {
+        teller = 0;
+        if (tur.getPassasjer1() == "null") {
+            teller += 1;
+        }
+        if (tur.getPassasjer2() == "null") {
+            teller += 1;
+        }
+        if (tur.getPassasjer3() == "null") {
+            teller += 1;
+        }
+        if (tur.getPassasjer4() == "null") {
+            teller += 1;
+        }
+        if (teller == 0) {
             tur.setLedigeSeter(0);
+            holder.seter.setImageResource(R.drawable.ingenledig);
+        }
+
+        switch (teller) {
+            case 1:
+                tur.setLedigeSeter(1);
+                holder.seter.setImageResource(R.drawable.enledig);
+                break;
+            case 2:
+                tur.setLedigeSeter(2);
+                holder.seter.setImageResource(R.drawable.toledige);
+                break;
+            case 3:
+                tur.setLedigeSeter(3);
+                holder.seter.setImageResource(R.drawable.treledige);
+                break;
+            case 4:
+                tur.setLedigeSeter(4);
+                holder.seter.setImageResource(R.drawable.fireledige);
+                break;
         }
 
         holder.avreiseSted.setText(tur.getAvreiseSted());
@@ -87,7 +117,7 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
             @Override
             public void onClick(View view) {
 
-                String[] passasjerer = new String[]{tur.getSjafor(),tur.getPassasjer1(),tur.getPassasjer2(),tur.getPassasjer3(),tur.getPassasjer4()};
+                String[] passasjerer = new String[]{tur.getSjafor(), tur.getPassasjer1(), tur.getPassasjer2(), tur.getPassasjer3(), tur.getPassasjer4()};
 
                 visPassasjerListe(passasjerer);
 
@@ -115,8 +145,8 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
                 turInfo.add(String.valueOf(tur.getAarsModell()));   // 12
                 turInfo.add(tur.getEpost());                        // 13
                 turInfo.add(String.valueOf(tur.getTelefonNr()));    // 14
-                // TODO bytte ut navn med innlogget bruker
-                avlystur(turInfo.get(0), turInfo.get(1), "Gregers Gram");
+
+                avlystur(turInfo.get(0), turInfo.get(1), navn);
 
             }
         });
@@ -130,10 +160,13 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
 
         String dialogValg = "Meld meg av";
 
-        if(sjafor.equals(navn)) {
+        // Hvis brukeren er sjaføren på turen gis det bare mulighet for å avlyse turen
+        if (sjafor.equals(navn)) {
             dialogValg = "Avlys tur";
             reiseInfo.setTitle("Vil du avlyse denne turen?");
+
         }
+
         // Kaller på metoden som sjekker hvilken plass brukeren er registrert med
         final String passasjerPlass = sjekkPassasjerPlass(turInfo, navn);
 
@@ -150,7 +183,8 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
                             public void onResponse(String response) {
 
                                 if (response.equals("Suksess")) {
-                                    Toast.makeText(context, "Suksess", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "Fjernet", Toast.LENGTH_SHORT).show();
+
                                 } else {
                                     Toast.makeText(context, "Feil på databasen..", Toast.LENGTH_SHORT).show();
                                 }
@@ -161,7 +195,8 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
 
                                 Toast.makeText(context, "Det skjedde en feil..", Toast.LENGTH_SHORT).show();
                                 Log.d("Volleyfeil", "" + error)
-;                            }
+                                ;
+                            }
                         }) {
                             @Override
                             protected Map<String, String> getParams() throws AuthFailureError {
@@ -176,53 +211,69 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
 
                         RequestQueue requestQueue = Volley.newRequestQueue(context);
                         requestQueue.add(fjernTur);
+                        // Hvis brukeren er sjafør for turen
+                        if (navn.equals(sjafor)) {
+                            // og hvis det finnes passasjerer på turen
+                            if (teller < 4) {
+                                // skal det sendes melding til passasjeren/ene
+                                sendTilPassasjerer();
+                            }
+                        }
 
                     }
                 }
         );
-        reiseInfo.setNeutralButton(
-                "Kontakt sjafør",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialog, int i) {
-                        AlertDialog.Builder kontaktDialog = new AlertDialog.Builder(context);
-                        kontaktDialog.setTitle("Kontakt sjafør");
-                        kontaktDialog.setPositiveButton(
-                                "SMS",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int i) {
-                                        //sendMelding(parseInt(turInfo.get(14)));
-                                        sendTilPassasjerer(new String[]{"92651892", "12345678", "81549300"});
-                                        dialog.cancel();
+
+        if (!(sjafor.equals(navn))) {
+
+            reiseInfo.setNeutralButton(
+                    "Kontakt sjafør",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(final DialogInterface dialog, int i) {
+                            AlertDialog.Builder kontaktDialog = new AlertDialog.Builder(context);
+                            kontaktDialog.setTitle("Kontakt sjafør");
+                            kontaktDialog.setPositiveButton(
+                                    "SMS",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int i) {
+                                            // Kaller på en metode som starter en ACTION_SEND intent
+                                            sendMelding(parseInt(turInfo.get(14))); // sjaførens tlfnr
+                                            dialog.cancel();
+                                        }
                                     }
-                                }
-                        );
-                        kontaktDialog.setNegativeButton(
-                                "Ring",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int i) {
-                                        ringSjafor(parseInt(turInfo.get(14)));
-                                        dialog.cancel();
+                            );
+                            kontaktDialog.setNegativeButton(
+                                    "Ring",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int i) {
+                                            // Kaller på en metode som starter en ACTION_DIAL intent
+                                            ringSjafor(parseInt(turInfo.get(14))); // sjaførens tlfnr
+                                            dialog.cancel();
+                                        }
                                     }
-                                }
-                        );
-                        kontaktDialog.setNeutralButton(
-                                "Mail",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int i) {
-                                        sendMail(turInfo.get(13));
-                                        dialog.cancel();
+                            );
+                            kontaktDialog.setNeutralButton(
+                                    "Mail",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int i) {
+                                            // Kaller på en metode som starter en ACTION_SEND intent
+                                            sendMail(turInfo.get(13)); // sjaførens epost
+                                            dialog.cancel();
+                                        }
                                     }
-                                }
-                        );
-                        kontaktDialog.show();
-                        dialog.cancel();
+                            );
+                            kontaktDialog.show();
+                            dialog.cancel();
+                        }
                     }
-                }
-        );
+            );
+
+        }
+
         reiseInfo.setNegativeButton(
                 "Avbryt",
                 new DialogInterface.OnClickListener() {
@@ -261,8 +312,8 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
 
         String passasjerInfo = "";
         // Her igjen sammenligner jeg med !=, siden jeg vet en tom passasjer er representert med "null"
-        for(String passasjer : passasjerer) {
-            if(passasjer != "null") {
+        for (String passasjer : passasjerer) {
+            if (passasjer != "null") {
                 passasjerInfo += passasjer + "\n";
 
 
@@ -292,7 +343,11 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
     public void sendMelding(int telefonNummer) {
         // Intent for å sende sende melding til sjaføren, med catch for om brukeren ikke kan sende sms
         try {
-            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms:", String.valueOf(telefonNummer), null)));
+
+            Intent sendMelding = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + telefonNummer));
+            sendMelding.putExtra("sms_body", "Turen er avlyst");
+            context.startActivity(sendMelding);
+
         } catch (ActivityNotFoundException e) {
             e.printStackTrace();
             Toast.makeText(context, "Du har ingen SMS-app", Toast.LENGTH_SHORT).show();
@@ -312,27 +367,81 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
     public void sendMail(String mail) {
         // Intent for å sende sjaføren mail, med catch for om brukeren ikke har en app som kan sende mail
         try {
-            context.startActivity(new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"+mail)));
+            context.startActivity(new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + mail)));
         } catch (ActivityNotFoundException e) {
             e.printStackTrace();
             Toast.makeText(context, "Fant ingen app du kan sende mail fra", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void sendTilPassasjerer(String[] passasjerer) {
-        StringBuilder mottakere = new StringBuilder();
-        for (String passasjer : passasjerer) {
-            mottakere.append(passasjer+";");
-        }
+    public void sendTilPassasjerer() {
+        // Intent for å sende alle påmeldte brukere melding om at turen er avlyst
+        final String passasjererTlfUrl = "http://gakk.one/6120-hjemmeeksamen/kontaktInfoTur.php";
 
-        try {
-            Intent gruppemelding = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:"+mottakere));
-            gruppemelding.putExtra("sms_body", "Turen er avlyst");
-            context.startActivity(gruppemelding);
-        } catch (ActivityNotFoundException e) {
-            e.printStackTrace();
-            Toast.makeText(context, "Fant ingen app du kan sende meldinger fra", Toast.LENGTH_SHORT).show();
-        }
+        StringRequest hentTlf = new StringRequest(Request.Method.POST, passasjererTlfUrl, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                ArrayList<String> tlfNummer = null;
+                JSONObject jsonObject = null;
+                try {
+                    jsonObject = new JSONObject(response);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                assert jsonObject != null;
+                JSONArray jsonArray = jsonObject.optJSONArray("TelefonNr");
+                tlfNummer = new ArrayList<>();
+
+                tlfNummer.clear();
+                for (int i = 0; i <= jsonArray.length(); i++) {
+                    try {
+                        JSONObject jsonTlf = (JSONObject) jsonArray.get(i);
+
+                        tlfNummer.add(jsonTlf.getString("telefonnr"));
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                // Bygger opp en string av mottakerenes tlfnr
+                StringBuilder mottakere = new StringBuilder();
+                for (int i = 0; i < tlfNummer.size(); i++) {
+                    mottakere.append(tlfNummer.get(i)).append(";");
+                }
+
+                try {
+                    // Sender melding til alle passasjerene
+                    Intent gruppemelding = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + mottakere));
+                    gruppemelding.putExtra("sms_body", "Turen er avlyst");
+                    context.startActivity(gruppemelding);
+
+                } catch (ActivityNotFoundException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "Fant ingen app du kan sende meldinger fra", Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("turID", turInfo.get(0));
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(hentTlf);
+
     }
 
     @Override
@@ -348,14 +457,14 @@ public class MineTurerAdapter extends RecyclerView.Adapter<MineTurerAdapter.View
 
         public ViewHolder(View itemView) {
             super(itemView);
-            seter           = itemView.findViewById(R.id.seter);
-            avreiseSted     = itemView.findViewById(R.id.avreise_sted);
-            ankomstSted     = itemView.findViewById(R.id.ankomst_sted);
-            sjafor          = itemView.findViewById(R.id.sjafor);
-            avreiseDato     = itemView.findViewById(R.id.avreise_dato);
-            avreiseKl       = itemView.findViewById(R.id.avreise_kl);
-            bilmodell       = itemView.findViewById(R.id.bilmodell);
-            parent_turer    = itemView.findViewById(R.id.tur_item_layout);
+            seter = itemView.findViewById(R.id.seter);
+            avreiseSted = itemView.findViewById(R.id.avreise_sted);
+            ankomstSted = itemView.findViewById(R.id.ankomst_sted);
+            sjafor = itemView.findViewById(R.id.sjafor);
+            avreiseDato = itemView.findViewById(R.id.avreise_dato);
+            avreiseKl = itemView.findViewById(R.id.avreise_kl);
+            bilmodell = itemView.findViewById(R.id.bilmodell);
+            parent_turer = itemView.findViewById(R.id.tur_item_layout);
             passasjer_liste = itemView.findViewById(R.id.passasjerliste);
         }
     }

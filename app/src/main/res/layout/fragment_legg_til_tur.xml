@@ -15,42 +15,69 @@
 
         <EditText
             android:padding="15dp"
-            android:id="@+id/varekode"
+            android:id="@+id/avreise_adresse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Varekode"
+            android:hint="Avreiseadresse"
             android:textAlignment="center"
-            android:inputType="number"/>
+            android:inputType="textAutoComplete" />
 
         <EditText
             android:padding="15dp"
-            android:id="@+id/betegnelse"
+            android:id="@+id/reisemaal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Betegnelse"
+            android:hint="Reisemål"
             android:textAlignment="center"
-            android:inputType="text"/>
+            android:inputType="textAutoComplete" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
 
         <EditText
             android:padding="15dp"
-            android:id="@+id/pris"
+            android:id="@+id/avreisedato"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:hint="Avreisedato"
+            android:inputType="date" />
+
+            <Button
+                android:id="@+id/velgdato"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Velg dato" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Pris pr enhet"
-            android:textAlignment="center"
-            android:inputType="numberDecimal"/>
+            android:gravity="center"
+            android:orientation="horizontal">
 
         <EditText
             android:padding="15dp"
-            android:id="@+id/lager_antall"
-            android:layout_width="match_parent"
+            android:id="@+id/avreisekl"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="Lagerantall"
+            android:hint="Klokkeslett"
             android:textAlignment="center"
-            android:inputType="number" />
+            android:inputType="time" />
+
+            <Button
+                android:id="@+id/velgklslett"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Velg kl.slett" />
+
+        </LinearLayout>
 
         <Button
-            android:id="@+id/registrerVare"
+            android:id="@+id/registrertur"
             android:layout_marginTop="30dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

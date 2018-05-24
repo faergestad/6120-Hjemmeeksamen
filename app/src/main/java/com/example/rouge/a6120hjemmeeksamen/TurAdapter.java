@@ -2,12 +2,10 @@ package com.example.rouge.a6120hjemmeeksamen;
 
 
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.provider.CalendarContract;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -51,15 +49,11 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import static com.example.rouge.a6120hjemmeeksamen.TurerFragment.mMap;
 
@@ -72,6 +66,7 @@ public class TurAdapter extends RecyclerView.Adapter<TurAdapter.ViewHolder> impl
     private List<Polyline> polylines;
     private List<Integer> turReferanse;
     private List<String> turInfo;
+    SharedPreferences pref;
     private static final int[] COLORS = new int[]{R.color.primary_dark_material_light};
 
     public TurAdapter(Context context, List<Tur> liste) {
@@ -94,20 +89,41 @@ public class TurAdapter extends RecyclerView.Adapter<TurAdapter.ViewHolder> impl
 
         // Sjekk for å velge hvilket ikon som skal vises frem, og hvor mange ledige plasser det er i bilen
         // Jeg sammenligner med == fordi databasen returnerer "null" hvis passasjerfeltet er tomt
+        int teller = 0;
         if(tur.getPassasjer1() == "null") {
-            tur.setLedigeSeter(4);
-            holder.seter.setImageResource(R.drawable.fireledige);
-        } else if(tur.getPassasjer2() == "null") {
-            tur.setLedigeSeter(3);
-            holder.seter.setImageResource(R.drawable.treledige);
-        } else if(tur.getPassasjer3() == "null") {
-            tur.setLedigeSeter(2);
-            holder.seter.setImageResource(R.drawable.toledige);
-        } else if(tur.getPassasjer4() == "null") {
-            tur.setLedigeSeter(1);
-            holder.seter.setImageResource(R.drawable.enledig);
-        } else {
+            teller += 1;
+        }
+        if (tur.getPassasjer2() == "null") {
+            teller += 1;
+        }
+        if (tur.getPassasjer3() == "null") {
+            teller += 1;
+        }
+        if (tur.getPassasjer4() == "null") {
+            teller += 1;
+        }
+        if (teller == 0) {
             tur.setLedigeSeter(0);
+            holder.seter.setImageResource(R.drawable.ingenledig);
+        }
+
+        switch (teller) {
+            case 1:
+                tur.setLedigeSeter(1);
+                holder.seter.setImageResource(R.drawable.enledig);
+                break;
+            case 2:
+                tur.setLedigeSeter(2);
+                holder.seter.setImageResource(R.drawable.toledige);
+                break;
+            case 3:
+                tur.setLedigeSeter(3);
+                holder.seter.setImageResource(R.drawable.treledige);
+                break;
+            case 4:
+                tur.setLedigeSeter(4);
+                holder.seter.setImageResource(R.drawable.fireledige);
+                break;
         }
 
 
@@ -397,8 +413,10 @@ public class TurAdapter extends RecyclerView.Adapter<TurAdapter.ViewHolder> impl
 
                         final int turID = turReferanse.get(0);
                         final int ledigeSeter = turReferanse.get(1);
-                        // TODO bytte ut navn med innlogget bruker
-                        final String navn = "Gregers Gram";
+
+                        pref = context.getSharedPreferences("login", Context.MODE_PRIVATE);
+                        final String navn = pref.getString("navn", "");
+
                         final String leggTilPassasjerURL = "http://gakk.one/6120-hjemmeeksamen/oppdaterTur.php";
 
                         if(turInfo.contains(navn)) {
@@ -410,56 +428,62 @@ public class TurAdapter extends RecyclerView.Adapter<TurAdapter.ViewHolder> impl
                                 public void onResponse(String response) {
 
                                     if(response.equals("Suksess")) {
+                                        // Gir bare mulighet for å sette inn i kalenderen hvis datoen er en dato
+                                        // Siden sjaføren kan velge å sette opp turen som fast, men dager som dato
+                                        if (turInfo.get(4).contains("2")) {
+                                            AlertDialog.Builder kalenderPrompt = new AlertDialog.Builder(context);
+                                            kalenderPrompt.setTitle("Lagt til i \"Mine turer\"");
+                                            kalenderPrompt.setMessage("Vil du legge til turen i din kalender?");
 
-                                        AlertDialog.Builder kalenderPrompt = new AlertDialog.Builder(context);
-                                        kalenderPrompt.setTitle("Lagt til i \"Mine turer\"");
-                                        kalenderPrompt.setMessage("Vil du legge til turen i din kalender?");
+                                            kalenderPrompt.setPositiveButton(
+                                                    "Ja",
+                                                    new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialogInterface, int i) {
 
-                                        kalenderPrompt.setPositiveButton(
-                                                "Ja",
-                                                new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                            // Legg til turen i brukerens kalender
+                                                            Intent turTilKalender = new Intent(Intent.ACTION_INSERT);
+                                                            turTilKalender.setType("vnd.android.cursor.item/event");
+                                                            turTilKalender.putExtra(CalendarContract.Events.TITLE, "Du haiker med " + turInfo.get(1));
+                                                            turTilKalender.putExtra(CalendarContract.Events.EVENT_LOCATION, turInfo.get(2));
+                                                            turTilKalender.putExtra(CalendarContract.Events.DESCRIPTION, "Reise fra: " + turInfo.get(2) + "\nTil: " + turInfo.get(3));
+                                                            turTilKalender.putExtra(CalendarContract.Events.ALLOWED_REMINDERS, true);
 
-                                                        // Legg til turen i brukerens kalender
-                                                        Intent turTilKalender = new Intent(Intent.ACTION_INSERT);
-                                                        turTilKalender.setType("vnd.android.cursor.item/event");
-                                                        turTilKalender.putExtra(CalendarContract.Events.TITLE, "Du haiker med " + turInfo.get(1));
-                                                        turTilKalender.putExtra(CalendarContract.Events.EVENT_LOCATION, turInfo.get(2));
-                                                        turTilKalender.putExtra(CalendarContract.Events.DESCRIPTION, "Reise fra: " + turInfo.get(2) + "\nTil: " + turInfo.get(3));
-                                                        turTilKalender.putExtra(CalendarContract.Events.ALLOWED_REMINDERS, true);
+                                                            String turDato = turInfo.get(4);
+                                                            String turAvreiseKl = turInfo.get(5);
+                                                            Calendar kalender = Calendar.getInstance();
+                                                            Date dato = null;
+                                                            try {
+                                                                dato = new SimpleDateFormat("yyyy-MM-dd-HH-mm").parse(
+                                                                        turDato + "-" + turAvreiseKl.charAt(0) + turAvreiseKl.charAt(1) + "-" + turAvreiseKl.charAt(3) + turAvreiseKl.charAt(4));
+                                                            } catch (ParseException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                            Log.d("dato", "" + dato);
+                                                            kalender.setTime(dato);
 
-                                                        String turDato = turInfo.get(4);
-                                                        String turAvreiseKl = turInfo.get(5);
-                                                        Calendar kalender = Calendar.getInstance();
-                                                        Date dato = null;
-                                                        try {
-                                                            dato = new SimpleDateFormat("yyyy-MM-dd-HH-mm").parse(
-                                                                    turDato+"-"+turAvreiseKl.charAt(0)+turAvreiseKl.charAt(1)+"-"+turAvreiseKl.charAt(3)+turAvreiseKl.charAt(4));
-                                                        } catch (ParseException e) {
-                                                            e.printStackTrace();
+                                                            turTilKalender.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, kalender.getTimeInMillis());
+
+                                                            context.startActivity(turTilKalender);
+
                                                         }
-                                                        Log.d("dato", "" + dato);
-                                                        kalender.setTime(dato);
-
-                                                        turTilKalender.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, kalender.getTimeInMillis());
-
-                                                        context.startActivity(turTilKalender);
-
                                                     }
-                                                }
-                                        );
-                                        kalenderPrompt.setNegativeButton(
-                                                "Nei",
-                                                new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int i) {
-                                                        dialog.cancel();
+                                            );
+                                            kalenderPrompt.setNegativeButton(
+                                                    "Nei",
+                                                    new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int i) {
+                                                            dialog.cancel();
+                                                        }
                                                     }
-                                                }
-                                        );
-                                        kalenderPrompt.show();
-
+                                            );
+                                            kalenderPrompt.show();
+                                            // Hvis brukeren har lagt til turen som fast, og med dagnavn som dato
+                                        } else {
+                                            Toast.makeText(context, "Lagt til i Mine Turer", Toast.LENGTH_SHORT).show();
+                                        }
+                                        // Hvis volley får feil svar
                                     } else {
                                         Toast.makeText(context, "Det var rart.. Prøv igjen", Toast.LENGTH_SHORT).show();
                                     }

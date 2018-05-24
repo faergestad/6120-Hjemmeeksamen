@@ -1,6 +1,8 @@
 package com.example.rouge.a6120hjemmeeksamen;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,7 +19,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.maps.SupportMapFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +36,7 @@ public class MineTurerFragment extends Fragment {
 
     private List<Tur> turListe;
     private RecyclerView.Adapter adapter;
+    SharedPreferences pref;
 
     public MineTurerFragment() {
         // Tom konstruktør
@@ -68,9 +70,11 @@ public class MineTurerFragment extends Fragment {
         final ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Laster...");
         progressDialog.show();
+        // Henter brukerens navn for å kunne sende den med i en POST-request
+        // Serveren bruker navnet for bare å finne turer som tilhører brukeren
+        pref = getActivity().getSharedPreferences("login", Context.MODE_PRIVATE);
+        final String navn = pref.getString("navn", "");
 
-        // TODO bytte ut navn med innlogget bruker
-        final String navn = "Gregers Gram";
 
         final String JSON_URL = "http://gakk.one/6120-hjemmeeksamen/mineTurer.php";
         StringRequest jsonStringRequest = new StringRequest(Request.Method.POST, JSON_URL, new Response.Listener<String>() {

@@ -1,6 +1,10 @@
 package com.example.rouge.a6120hjemmeeksamen;
 
-import android.os.AsyncTask;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,30 +14,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
-import org.json.JSONObject;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import static java.lang.Integer.parseInt;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class LeggTilTurFragment extends Fragment {
 
-    String melding, ID_Holder, Beskrivelse_Holder, Pris_Holder, LagerAnt_Holder;
-    EditText leggTilId, leggTilBeskrivelse, leggTilPris, leggTilLagerAntall;
-    Button leggTilVare;
-    JSONObject jsonVare;
-    Boolean CheckEditText;
+    EditText editAdresse, editMaal, editDato, editKl;
+    SharedPreferences pref;
+    Button leggTilTur, velgDato, velgKlSlett;
+    Boolean ikkeErTom;
+    private int aar, mnd, dag, time, minutt;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstance) {
@@ -41,124 +46,155 @@ public class LeggTilTurFragment extends Fragment {
 
         getActivity().setTitle("Opprett ny tur");
 
-        leggTilId = view.findViewById(R.id.varekode);
-        leggTilBeskrivelse = view.findViewById(R.id.betegnelse);
-        leggTilPris = view.findViewById(R.id.pris);
-        leggTilLagerAntall = view.findViewById(R.id.lager_antall);
-        leggTilVare = view.findViewById(R.id.registrerVare);
+        editAdresse = view.findViewById(R.id.avreise_adresse);
+        editMaal = view.findViewById(R.id.reisemaal);
 
-        leggTilVare.setOnClickListener(new View.OnClickListener() {
+        velgDato = view.findViewById(R.id.velgdato);
+        velgKlSlett = view.findViewById(R.id.velgklslett);
+        editDato = view.findViewById(R.id.avreisedato);
+        editKl = view.findViewById(R.id.avreisekl);
+
+        velgDato.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                CheckEditTextIsEmptyOrNot();
-                if (CheckEditText) {
+                // Henter dagens dato til kalenderdialoget
+                final Calendar c = Calendar.getInstance();
+                aar = c.get(Calendar.YEAR);
+                mnd = c.get(Calendar.MONTH);
+                dag = c.get(Calendar.DAY_OF_MONTH);
 
-                    int id = Integer.parseInt(leggTilId.getText().toString());
-                    String desc = leggTilBeskrivelse.getText().toString();
-                    double pris = Double.parseDouble(leggTilPris.getText().toString());
-                    int lagerAntall = parseInt(leggTilLagerAntall.getText().toString());
+                // Starter DatePicker dialogvinduet
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
+                        new DatePickerDialog.OnDateSetListener() {
 
-                    //Tur tur = new Tur(id, desc, pris, lagerAntall, 1);
-                    //jsonVare = tur.lagJSONObject();
+                            @Override
+                            public void onDateSet(DatePicker view, int aar,
+                                                  int mnd, int dag) {
 
-                    LeggTilTurFragment.NyVare nyVare = new LeggTilTurFragment.NyVare();
-                    nyVare.execute();
-                } else {
-                    Toast.makeText(getContext(), "Fyll ut alle feltene", Toast.LENGTH_SHORT).show();
-                }
+                                editDato.setText(aar + "-" + mnd + "-" + dag);
+
+                            }
+                        }, aar, mnd, dag);
+                datePickerDialog.show();
+
             }
         });
+
+        velgKlSlett.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Henter nåværende klokkeslett
+                final Calendar c = Calendar.getInstance();
+                time = c.get(Calendar.HOUR_OF_DAY);
+                minutt = c.get(Calendar.MINUTE);
+
+                // Starter TimePicker dialogvinduet
+                TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
+                        new TimePickerDialog.OnTimeSetListener() {
+
+                            @Override
+                            public void onTimeSet(TimePicker view, int timer,
+                                                  int minutter) {
+
+                                editKl.setText(timer + ":" + minutter);
+                            }
+                        }, time, minutt, false);
+                timePickerDialog.show();
+
+            }
+        });
+
+        leggTilTur = view.findViewById(R.id.registrertur);
+
+        leggTilTur.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String adresse = editAdresse.getText().toString();
+                String maal = editMaal.getText().toString();
+                String dato = editDato.getText().toString();
+                String klslett = editKl.getText().toString();
+                // En metode som sjekker om feltene har innhold
+                sjekkOmErTom(adresse, maal, dato, klslett);
+
+                if (ikkeErTom) {
+                    opprettTur(adresse, maal, dato, klslett);
+                } else {
+                    Toast.makeText(getActivity(), "Fyll ut alle feltene", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+
+    }
+
+
+    private void opprettTur(final String adresse, final String maal, final String dato, final String klslett) {
+
+        String opprettBrukerURL = "http://gakk.one/6120-hjemmeeksamen/opprettTur.php";
+
+        StringRequest opprettBrukerRequest = new StringRequest(Request.Method.POST, opprettBrukerURL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                if (response.equals("Suksess")) {
+
+                    Toast.makeText(getActivity(), "Tur opprettet", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(getActivity(), MainActivity.class));
+
+                } else {
+
+                    Toast.makeText(getActivity(), "Det skjedde en feil", Toast.LENGTH_SHORT).show();
+                    Log.d("Response", "" + response);
+
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volleyfeil", "" + error);
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                pref = getActivity().getSharedPreferences("login", Context.MODE_PRIVATE);
+                // TODO bruke directions-api for å kunne finne ut ca ankomsttid
+                final String navn = pref.getString("navn", "");
+                Map<String, String> params = new HashMap<>();
+                params.put("sjafor", navn);
+                params.put("adresse", adresse);
+                params.put("maal", maal);
+                params.put("dato", dato);
+                params.put("klslett", klslett);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+        requestQueue.add(opprettBrukerRequest);
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Inflater layouten for fragmentet
         return inflater.inflate(R.layout.fragment_legg_til_tur, container, false);
     }
 
-    public class NyVare extends AsyncTask<String, String, Long> {
+    // Metode for å sjekke om teksfeltene har innhold
+    private void sjekkOmErTom(String epost, String passord, String navn, String tlf) {
 
-        HttpURLConnection connection = null;
-
-        @Override
-        protected Long doInBackground(String... params) {
-            try {
-                URL url = new URL("http://10.0.2.2/hobbyhuset/api.php/Tur");
-                //URL url = new URL("http://192.168.10.171/hobbyhuset/api.php/Vare");
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
-                connection.setDoOutput(true);
-                connection.setDoInput(true);
-                connection.setChunkedStreamingMode(0);
-                connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                connection.connect();
-                OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
-                out.write(jsonVare.toString());
-                out.close();
-                InputStream is = connection.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-                String responseString;
-                StringBuilder sb = new StringBuilder();
-                while ((responseString = reader.readLine()) != null) {
-                    sb = sb.append(responseString);
-                }
-                String response = sb.toString();
-                melding = response;
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                System.out.println("IOException");
-                e.printStackTrace();
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                assert connection != null;
-                connection.disconnect();
-            } return (0L);
+        if (TextUtils.isEmpty(epost) || TextUtils.isEmpty(passord) || TextUtils.isEmpty(navn) || TextUtils.isEmpty(tlf)) {
+            ikkeErTom = false;
+        } else {
+            ikkeErTom = true;
         }
 
-        @Override
-        protected void onPostExecute(Long result) {
-
-            leggTilId.setText("");
-            leggTilBeskrivelse.setText("");
-            leggTilPris.setText("");
-            leggTilLagerAntall.setText("");
-
-            if (melding.equals("null") ) {
-                Toast.makeText(getActivity(), "Varen eksisterer allerede", Toast.LENGTH_SHORT).show();
-
-            } else {
-                Toast.makeText(getActivity(), "Tur Opprettet", Toast.LENGTH_SHORT).show();
-                Log.d("feil", "" + melding);
-            }
-        }
-
-    }
-
-    public void CheckEditTextIsEmptyOrNot() {
-
-        ID_Holder = leggTilId.getText().toString();
-        Beskrivelse_Holder = leggTilBeskrivelse.getText().toString();
-        Pris_Holder = leggTilPris.getText().toString();
-        LagerAnt_Holder = leggTilLagerAntall.getText().toString();
-
-        if(TextUtils.isEmpty(ID_Holder) || TextUtils.isEmpty(Beskrivelse_Holder) || TextUtils.isEmpty(Pris_Holder) || TextUtils.isEmpty(LagerAnt_Holder))
-        {
-
-            CheckEditText = false;
-
-        }
-        else {
-
-            CheckEditText = true ;
-        }
     }
 
 }

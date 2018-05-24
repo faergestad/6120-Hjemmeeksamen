@@ -3,102 +3,59 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginLeft="30dp"
+    android:layout_marginRight="30dp"
+    android:layout_marginTop="50dp"
     android:orientation="vertical"
+    android:weightSum="2"
     tools:context=".SettingsFragment">
 
-    <LinearLayout
+
+    <EditText
+        android:id="@+id/husksted"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:hint="@string/fast_avreisested"
+        android:textSize="22sp" />
 
-        <Button
-            android:layout_width="wrap_content"
+
+    <EditText
+        android:id="@+id/huskTidspunkt"
+        android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:background="@null"
-            android:fontFamily="@font/roboto_light"
-            android:text="Fast avreisested"
-            android:textSize="28dp" />
+        android:hint="@string/fast_avreisetidspunkt"
+        android:textSize="22sp" />
 
-        <View
+    <EditText
+        android:id="@+id/huskMaal"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginLeft="13dp"
-            android:layout_marginRight="13dp"
-            android:layout_marginTop="3dp"
-            android:background="@android:color/darker_gray" />
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        android:hint="@string/fast_avreisem_l"
+        android:textSize="22sp" />
+
+    <Button
+        android:id="@+id/lagre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:fontFamily="@font/roboto_light"
+        android:gravity="center"
+        android:text="@string/lagre_min_faste_informasjon" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:background="@null"
-            android:fontFamily="@font/roboto_light"
-            android:text="Fast avreisetidspunkt"
-            android:textSize="28dp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginLeft="13dp"
-            android:layout_marginRight="13dp"
-            android:layout_marginTop="3dp"
-            android:background="@android:color/darker_gray" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:background="@null"
-            android:fontFamily="@font/roboto_light"
-            android:text="Fast reisemål"
-            android:textSize="28dp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginLeft="13dp"
-            android:layout_marginRight="13dp"
-            android:layout_marginTop="3dp"
-            android:background="@android:color/darker_gray" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:weightSum="5">
+        android:layout_height="match_parent">
 
         <Button
             android:id="@+id/glem_meg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="30dp"
-            android:background="@null"
-            android:fontFamily="@font/roboto_light"
-            android:text="Glem innlogging | Logg ut"
-            android:textSize="28dp" />
-
-        <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginLeft="13dp"
-            android:layout_marginRight="13dp"
-            android:layout_marginTop="3dp"
-            android:background="@android:color/darker_gray" />
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:background="@null"
+            android:text="@string/logg_ut"
+            android:textColor="@color/colorPrimary"
+            android:textSize="28sp" />
+
     </LinearLayout>
 
 </LinearLayout>

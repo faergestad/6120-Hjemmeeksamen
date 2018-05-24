@@ -1,7 +1,5 @@
 package com.example.rouge.a6120hjemmeeksamen;
 
-import android.support.v7.widget.RecyclerView;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
