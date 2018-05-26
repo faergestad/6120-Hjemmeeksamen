@@ -32,7 +32,7 @@
             android:resource="@array/preloaded_fonts" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCJp85Mu9GCseaaEVgRu88PwyZ4ZU5K4Os" />
+            android:value="INSERT YOUR API KEY HERE" />
 
         <activity android:name=".RegistrerBruker"></activity>
     </application>
