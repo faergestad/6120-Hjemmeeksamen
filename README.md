@@ -6,7 +6,7 @@ Rideshare for studenter med mulighet for å registrere seg både med og uten bil
 #### Login - registrer ny bruker - collapsible "hamburger menu"
 
 ![2](https://user-images.githubusercontent.com/20108194/44272151-53a72300-a23c-11e8-8ce1-794fd14d4112.PNG)
-#### Liste over tilgjengelige turer, med mulighet for å se rute, antall og hvilke passasjerer + mulighet for å melde seg på
+#### Liste over turer, med mulighet for å se rute, antall og hvilke passasjerer + mulighet for å melde seg på + dynamisk søkefunksjon
 
 ![3](https://user-images.githubusercontent.com/20108194/44272166-5d308b00-a23c-11e8-8726-dd6d1606ee9f.PNG)
 #### Oversikt over brukerens turer, mulighet for å kontakte sjåfør, opprette ny tur, sett opp faste turer
